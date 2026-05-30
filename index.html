@@ -446,17 +446,18 @@
         document.getElementById('btn-next').style.display = 'none';
         showScreen('screen-round');
     }
-    function handleCaseAnswer(index, clickedBtn) {
+        function handleCaseAnswer(index, clickedBtn) {
         const q = gameState.currentQuestions[gameState.currentQuestionIndex];
         document.querySelectorAll('.btn-answer').forEach((btn,i) => { btn.disabled = true; if(q.answers[i].score === 3) btn.classList.add('correct'); });
         if(q.answers[index].score < 3) clickedBtn.classList.add('wrong');
         const earned = q.answers[index].score;
         gameState.caseScore += earned; gameState.totalScore += earned;
         const emoji = earned === 3 ? '🌟 Отлично!' : earned === 2 ? '👍 Хорошо!' : '🤔 Можно лучше!';
+        const ballWord = earned === 1 ? 'балл' : 'балла';
         document.getElementById('nko-case-container').innerHTML = `
             <div class="nko-case-card">
-                <div class="nko-case-score">💰 +${earned} балла!</div>
-                <div class="nko-case-reaction">${emoji} ${q.answers[index].text.substring(0,1).toUpperCase() + q.answers[index].text.substring(1)}</div>
+                <div class="nko-case-score">💰 +${earned} ${ballWord}!</div>
+                <div class="nko-case-reaction">${emoji} ${q.answers[index].text}</div>
                 <div class="nko-case-divider"></div>
                 <div class="nko-case-name">🏢 ${q.nko.name}</div>
                 <div class="nko-case-desc">${q.nko.desc}</div>
