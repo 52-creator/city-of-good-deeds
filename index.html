@@ -192,9 +192,12 @@
     <div id="screen-final" class="screen">
         <span class="section-label">Финал</span>
         <h2>🏛️ Кому нужна помощь?</h2>
-        <p>У вас есть <strong id="final-score-display">0</strong> баллов.<br>Выберите задачи, которые хотите решить:</p>
+        <div class="stats-bar">
+            <div class="stat">💰 Всего баллов: <span class="stat-value" id="final-total-score">0</span></div>
+            <div class="stat">✅ Осталось: <span class="stat-value" id="remaining-score">0</span></div>
+        </div>
+        <p style="margin-top:5px;">Выберите задачи, которые хотите решить:</p>
         <div class="institution-grid" id="institutions-container"></div>
-        <div class="stats-bar"><div class="stat">💰 Осталось баллов: <span class="stat-value" id="remaining-score">0</span></div></div>
         <button id="btn-finish" onclick="finishGame()">🏆 Завершить игру</button>
     </div>
 
@@ -529,20 +532,21 @@
     // ==================== СТАТИСТИКА ====================
     function showStatsSummary() {
         document.getElementById('stats-summary').innerHTML = `
-            <div class="stats-summary-item"><span class="icon">📝</span>Викторина<span class="value">${gameState.quizCorrect}/${gameState.quizTotal}</span></div>
-            <div class="stats-summary-item"><span class="icon">💼</span>Кейсы<span class="value">${gameState.caseScore} баллов</span></div>
-            <div class="stats-summary-item"><span class="icon">🧭</span>Дилеммы<span class="value">${gameState.dilemmaValues.length} решено</span></div>
-            <div class="stats-summary-item"><span class="icon">💰</span>Всего баллов<span class="value">${gameState.totalScore}</span></div>`;
+            <div class="stats-summary-item"><span class="icon">📝</span>Викторина<br><span class="value">${gameState.quizCorrect}/${gameState.quizTotal}</span></div>
+            <div class="stats-summary-item"><span class="icon">💼</span>Кейсы<br><span class="value">${gameState.caseScore} баллов</span></div>
+            <div class="stats-summary-item"><span class="icon">🧭</span>Дилеммы<br><span class="value">${gameState.dilemmaValues.length} решено</span></div>
+            <div class="stats-summary-item"><span class="icon">💰</span>Всего баллов<br><span class="value">${gameState.totalScore}</span></div>`;
         showScreen('screen-stats');
     }
 
     // ==================== ФИНАЛ ====================
     function startFinal() {
-        document.getElementById('final-score-display').textContent = gameState.totalScore;
+        document.getElementById('final-total-score').textContent = gameState.totalScore;
         document.getElementById('remaining-score').textContent = gameState.totalScore;
         renderInstitutions();
         showScreen('screen-final');
     }
+
     function getTotalSpent() { return Object.values(gameState.spent).reduce((s,v) => s+v, 0); }
     function renderInstitutions() {
         const container = document.getElementById('institutions-container'); container.innerHTML = '';
@@ -569,6 +573,7 @@
     }
     function updateRemainingScore() {
         const rem = gameState.totalScore - getTotalSpent();
+        document.getElementById('final-total-score').textContent = gameState.totalScore;
         document.getElementById('remaining-score').textContent = rem;
         document.getElementById('btn-finish').textContent = rem > 0 ? `🏆 Завершить (осталось ${rem} бал.)` : '🏆 Завершить игру';
     }
