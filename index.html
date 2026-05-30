@@ -272,7 +272,7 @@
         { title: 'Ситуация 1: Субботник в парке', question: 'Вы хотите провести субботник, но нет инвентаря. Как поступите?',
             answers: [
                 { text: 'Обратиться в администрацию района', score: 2 },
-                { text: 'Найти местный бизнес-партнёра', score: 3 },
+                { text: 'Найти местного бизнес-партнёра', score: 3 },
                 { text: 'Купить всё за свой счёт', score: 1 }
             ],
             nko: { name: 'ТРОО «Экологическая защита»', desc: 'Проводит субботники и экоакции в Тульской области. Можно присоединиться к ближайшей уборке парка или предложить свою территорию.', link: 'https://dobro.ru/organizations/10007669/feed' }
@@ -552,7 +552,8 @@
             let tasksHTML = '';
             inst.tasks.forEach((t,i) => {
                 let cls = 'task-item'; if(t.done) cls += ' done'; if(!t.done && gameState.totalScore - getTotalSpent() < t.cost) cls += ' locked';
-                tasksHTML += `<div class="${cls}" onclick="toggleTask('${inst.id}',${i})"><span>${t.text}</span><span class="task-cost">${t.cost} балл.</span></div>`;
+                const costWord = t.cost === 6 ? '6 баллов' : t.cost + ' балла';
+                tasksHTML += `<div class="${cls}" onclick="toggleTask('${inst.id}',${i})"><span>${t.text}</span><span class="task-cost">${costWord}</span></div>`;
             });
             card.innerHTML = `<div class="institution-icon">${inst.name.split(' ')[0]}</div><div class="institution-name">${inst.name}</div><div style="opacity:0.7;margin-bottom:10px;">${inst.desc}</div>${tasksHTML}`;
             container.appendChild(card);
