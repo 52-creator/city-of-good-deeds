@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Город Добрых Дел</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #eee;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
+
+        .game-container {
+            width: 100%;
+            max-width: 1000px;
+            min-height: 90vh;
+            background: #16213e;
+            border-radius: 20px;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border: 2px solid #1a3a5c;
+        }
+
+        .screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            color: #e94560;
+            text-shadow: 0 0 20px rgba(233, 68, 96, 0.3);
+        }
+
+        h2 {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            color: #f0a500;
+        }
+
+        h3 {
+            font-size: 1.3em;
+            color: #e94560;
+            margin-bottom: 10px;
+        }
+
+        p {
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            max-width: 750px;
+        }
+
+        button {
+            background: #e94560;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1em;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 8px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        button:hover {
+            background: #c23152;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(233, 68, 96, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .btn-answer {
+            display: block;
+            width: 100%;
+            max-width: 600px;
+            text-align: left;
+            background: #0f3460;
+            margin: 8px auto;
+            padding: 15px 25px;
+            border-radius: 15px;
+            font-size: 1.05em;
+        }
+
+        .btn-answer:hover {
+            background: #1a508b;
+        }
+
+        .btn-answer.correct {
+            background: #2ecc71 !important;
+            animation: pulse 0.5s ease;
+        }
+
+        .btn-answer.wrong {
+            background: #e74c3c !important;
+        }
+
+        .btn-answer:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        @keyframes pulse {
+            0%,
+            100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.03);
+            }
+        }
+
+        /* Карточка НКО */
+        .nko-card {
+            background: linear-gradient(135deg, #1a3a5c 0%, #0f3460 100%);
+            border: 2px solid #f0a500;
+            border-radius: 20px;
+            padding: 25px;
+            margin: 15px auto;
+            max-width: 700px;
+            text-align: left;
+        }
+
+        .nko-card .nko-name {
+            font-size: 1.4em;
+            color: #f0a500;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .nko-card .nko-desc {
+            font-size: 1em;
+            line-height: 1.6;
+            color: #ccc;
+        }
+
+        .nko-card .nko-link {
+            display: inline-block;
+            margin-top: 12px;
+            color: #e94560;
+            text-decoration: underline;
+            font-weight: bold;
+        }
+
+        /* Карта города */
+        .city-map {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 15px;
+            width: 100%;
+            max-width: 700px;
+            margin: 20px auto;
+        }
+
+        .district {
+            background: #2c3e50;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid #34495e;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+        }
+
+        .district.clickable:hover {
+            background: #34495e;
+            border-color: #f0a500;
+            transform: scale(1.03);
+        }
+
+        .district.level-1 {
+            background: #1a6b3c;
+            border-color: #2ecc71;
+        }
+
+        .district.level-2 {
+            background: #1a8b4c;
+            border-color: #27ae60;
+        }
+
+        .district.level-3 {
+            background: #0a5c2c;
+            border-color: #f0a500;
+            box-shadow: 0 0 30px rgba(240, 165, 0, 0.5);
+        }
+
+        .district-icon {
+            font-size: 2.5em;
+            margin-bottom: 8px;
+        }
+
+        .district-name {
+            font-size: 0.95em;
+            opacity: 0.9;
+        }
+
+        .district-progress {
+            font-size: 0.8em;
+            margin-top: 5px;
+            opacity: 0.7;
+        }
+
+        /* Ресурсы */
+        .stats-bar {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            max-width: 700px;
+            margin: 15px auto;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            background: #0f3460;
+            padding: 15px 25px;
+            border-radius: 15px;
+            font-size: 1.1em;
+            font-weight: bold;
+            flex: 1;
+            min-width: 150px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            color: #f0a500;
+            display: block;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            max-width: 700px;
+            background: #2c3e50;
+            border-radius: 20px;
+            height: 30px;
+            margin: 15px auto;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #e94560, #f0a500);
+            border-radius: 20px;
+            transition: width 0.8s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9em;
+            color: #1a1a2e;
+        }
+
+        .intro-text {
+            background: #0f3460;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px auto;
+            max-width: 700px;
+            border-left: 5px solid #f0a500;
+            text-align: left;
+            white-space: pre-line;
+        }
+
+        .round-number {
+            font-size: 0.9em;
+            color: #f0a500;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 10px;
+        }
+
+        .explanation-box {
+            background: #0f3460;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px auto;
+            max-width: 700px;
+            text-align: left;
+            border-left: 5px solid #2ecc71;
+        }
+
+        .hero-block {
+            background: linear-gradient(135deg, #2c1810 0%, #1a0f0a 100%);
+            border: 2px solid #f0a500;
+            border-radius: 20px;
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 700px;
+            text-align: left;
+        }
+
+        .hero-block .hero-name {
+            font-size: 1.3em;
+            color: #f0a500;
+            font-weight: bold;
+        }
+
+        .final-stats {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 20px auto;
+        }
+
+        .final-stat {
+            background: #0f3460;
+            padding: 12px 18px;
+            border-radius: 12px;
+            font-size: 0.9em;
+        }
+
+        .stars {
+            font-size: 4em;
+            margin: 20px;
+            animation: bounce 0.6s ease infinite alternate;
+        }
+
+        @keyframes bounce {
+            from {
+                transform: translateY(0);
+            }
+            to {
+                transform: translateY(-15px);
+            }
+        }
+
+        .section-label {
+            display: inline-block;
+            background: #e94560;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .game-container {
+                padding: 15px;
+            }
+            h1 {
+                font-size: 1.8em;
+            }
+            h2 {
+                font-size: 1.3em;
+            }
+            .city-map {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+            .district {
+                padding: 15px;
+                min-height: 90px;
+                font-size: 0.85em;
+            }
+            .district-icon {
+                font-size: 1.8em;
+            }
+            .stats-bar {
+                flex-direction: column;
+                gap: 10px;
+            }
+            button {
+                padding: 12px 25px;
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+
+        <!-- Стартовый экран -->
+        <div id="screen-start" class="screen active">
+            <h1>🏙️ Город Добрых Дел</h1>
+            <p>Вы — команда волонтёров. Ваш город ждёт помощи!</p>
+            <p>Вместе вы будете отвечать на вопросы, решать реальные ситуации,<br>знакомиться с некоммерческими организациями и восстанавливать районы города.</p>
+            <p><strong>Цель:</strong> набрать 50 очков Общественного Блага и возродить все районы.</p>
+            <p style="font-size:0.85em;opacity:0.7;">Голосуйте всем классом! Учитель нажимает кнопку, которую выбрало большинство.</p>
+            <button onclick="startGame()">🚀 Начать игру</button>
+        </div>
+
+        <!-- Интро раунда -->
+        <div id="screen-intro" class="screen">
+            <div class="round-number" id="round-label"></div>
+            <h2 id="intro-title"></h2>
+            <div class="intro-text" id="intro-text"></div>
+            <button onclick="startRoundQuestions()">▶️ Продолжить</button>
+        </div>
+
+        <!-- Вопрос -->
+        <div id="screen-question" class="screen">
+            <h2 id="question-title"></h2>
+            <p id="question-text"></p>
+            <div id="answers-container"></div>
+            <div id="explanation-container" class="explanation-box" style="display:none;"></div>
+            <button id="btn-next-question" style="display:none;" onclick="nextQuestion()">▶️ Далее</button>
+        </div>
+
+        <!-- Знакомство с НКО -->
+        <div id="screen-nko" class="screen">
+            <span class="section-label">Знакомство с НКО</span>
+            <h2 id="nko-title"></h2>
+            <div class="nko-card" id="nko-card"></div>
+            <button onclick="nextAfterNko()">▶️ К викторине</button>
+        </div>
+
+        <!-- Развитие города -->
+        <div id="screen-develop" class="screen">
+            <h2>🏗️ Развитие Города</h2>
+            <p>У вас есть <strong id="dev-resources">0</strong> ресурсов.</p>
+            <p style="font-size:0.9em;opacity:0.8;">Выберите район для улучшения (стоимость: 2 ресурса):</p>
+            <div class="city-map" id="dev-districts"></div>
+            <div class="stats-bar">
+                <div class="stat">🏆 Общественное благо: <span class="stat-value" id="dev-blago">0</span>/50</div>
+            </div>
+            <div id="dev-continue-container"></div>
+        </div>
+
+        <!-- Карта (хаб) -->
+        <div id="screen-map" class="screen">
+            <h2>🏙️ Город Добрых Дел</h2>
+            <div class="city-map" id="map-districts"></div>
+            <div class="stats-bar">
+                <div class="stat">💰 Ресурсы: <span class="stat-value" id="map-resources">0</span></div>
+                <div class="stat">🏆 Благо: <span class="stat-value" id="map-blago">0</span>/50</div>
+            </div>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="map-progress-bar" style="width:0%;">0%</div>
+            </div>
+            <button onclick="goToNextRound()">▶️ Следующий раунд</button>
+        </div>
+
+        <!-- Финал -->
+        <div id="screen-final" class="screen">
+            <h1 id="final-title"></h1>
+            <div class="stars" id="final-stars"></div>
+            <p id="final-text"></p>
+            <div class="final-stats" id="final-stats"></div>
+            <button onclick="location.reload()">🔄 Играть снова</button>
+        </div>
+
+    </div>
+
+    <script>
+        // ==================== СОСТОЯНИЕ ИГРЫ ====================
+        const gameState = {
+            currentRound: 0,
+            resources: 0,
+            blago: 0,
+            districts: {
+                park: { name: '🌳 Парк', icon: '🌳', level: 0, max: 3 },
+                culture: { name: '🎭 Культурный центр', icon: '🎭', level: 0, max: 3 },
+                admin: { name: '🏛️ Администрация', icon: '🏛️', level: 0, max: 3 },
+                social: { name: '🏥 Соц. центр', icon: '🏥', level: 0, max: 3 },
+                sport: { name: '⚽ Спортплощадка', icon: '⚽', level: 0, max: 3 }
+            },
+            currentQuestionIndex: 0,
+            roundQuestions: []
+        };
+
+// ==================== БАНК ЗАДАНИЙ (5 РАУНДОВ) ====================
+const rounds = [{
+    title: 'Раунд 1: Добровольчество — с чего всё начинается',
+    intro: 'Добро пожаловать в Город Добрых Дел! 🏙️\n\nЭтот город ждёт вашей помощи. Сегодня вы — команда волонтёров, и ваша задача — возродить город, район за районом.\n\nВ этом раунде мы узнаем, что такое добровольчество, как оно появилось в России и как работает сегодня.\n\nПервый район, который ждёт помощи — Парк. Он совсем запущен, но вместе мы вернём ему жизнь!',
+    nko: {
+        title: 'Реальная история: Ресурсный центр «Добровольчество»',
+        text: '<div class="nko-name">🏢 Ресурсный центр по развитию добровольчества</div>' +
+            '<div class="nko-desc">В каждом регионе России есть ресурсные центры, которые помогают волонтёрам и НКО. В Тульской области такой центр работает с 2017 года. Они обучают волонтёров, помогают с организацией акций и связывают добровольцев с теми, кому нужна помощь.<br><br>' +
+            '<strong>За год через них проходят сотни волонтёров!</strong> Если вы хотите помогать, но не знаете с чего начать — обратитесь в ресурсный центр вашего города.<br><br>' +
+            '💡 <em>«Волонтёрство — это не работа, это образ жизни. Каждый может найти дело по душе: от помощи животным до организации городских праздников.»</em></div>' +
+            '<a class="nko-link" href="https://добро.рф" target="_blank" rel="noopener">🔗 Открыть платформу Добро.ру</a>'
+    },
+    quiz: {
+        type: 'quiz',
+        title: '📝 Викторина',
+        question: 'В каком году в России был принят Федеральный закон «О благотворительной деятельности и добровольчестве (волонтёрстве)»?',
+        answers: [
+            { text: '1995 год', correct: true,
+                explanation: '✅ Верно! Закон №135-ФЗ принят в 1995 году. Это базовый документ, который регулирует всю волонтёрскую деятельность в России. Он дал определения благотворительности и добровольчеству, установил права и обязанности.' },
+            { text: '2005 год', correct: false,
+                explanation: '❌ Нет. Закон был принят раньше — в 1995 году (№135-ФЗ). В 2005 году уже активно работали волонтёрские организации по всей стране.' },
+            { text: '2010 год', correct: false,
+                explanation: '❌ Нет. Закон о добровольчестве работает в России с 1995 года. К 2010 году волонтёрство уже было развитым движением.' },
+            { text: '2018 год', correct: false,
+                explanation: '❌ Нет. В 2018 году в закон вносили важные поправки (Год добровольца в России), но сам закон принят гораздо раньше — в 1995 году.' }
+        ]
+    },
+    case: {
+        type: 'case',
+        title: '💼 Ситуация',
+        question: 'Вы хотите провести субботник в парке, но у вас нет граблей, перчаток и мусорных мешков. Как поступите?',
+        answers: [
+            { text: 'Обратиться в администрацию района', resources: 2, correct: false,
+                explanation: '👍 Неплохо! Администрация может помочь инвентарём. Но это займёт время на согласование. Вы получаете 2 ресурса. Оптимальный вариант — партнёрство с местным бизнесом.' },
+            { text: 'Купить всё за свой счёт', resources: 1, correct: false,
+                explanation: '🤔 Благородно, но неэффективно. Волонтёры не обязаны тратить личные деньги. К тому же, есть способы получить инвентарь бесплатно. 1 ресурс.' },
+            { text: 'Найти местный бизнес, который предоставит инвентарь за упоминание в соцсетях',
+                resources: 3, correct: true,
+                explanation: '🌟 Отлично! Партнёрство с бизнесом — нормальная практика для НКО. Бизнес получает рекламу, вы — инвентарь. Все в выигрыше! Это и есть социальное партнёрство. 3 ресурса!' }
+        ]
+    }
+}, {
+    title: 'Раунд 2: Виды волонтёрства — каждому по душе',
+    intro: 'Волонтёрство бывает разным: социальное, экологическое, спортивное, событийное, культурное, медицинское, зооволонтёрство и многое другое.\n\nКаждый может найти направление, которое близко именно ему. Сегодня мы узнаем о видах добровольчества и поможем Культурному центру организовать мероприятия для жителей!',
+    nko: {
+        title: 'Реальная история: Волонтёры культуры',
+        text: '<div class="nko-name">🎨 Волонтёры культуры Тульской области</div>' +
+            '<div class="nko-desc">В Туле и области действует программа «Волонтёры культуры». Эти ребята помогают в музеях, библиотеках, на фестивалях. Они проводят экскурсии, помогают реставрировать памятники, организуют концерты.<br><br>' +
+            '<strong>Знаете ли вы?</strong> В музее-усадьбе «Ясная Поляна» (Тульская область) волонтёры помогают сохранять наследие Льва Толстого — ухаживают за садами, проводят экскурсии для туристов.<br><br>' +
+            '💡 <em>«Культура — это то, что делает нас людьми. Помогая сохранять её, мы сохраняем себя.»</em></div>' +
+            '<a class="nko-link" href="https://dobro.ru/organizations/10065923/about" target="_blank" rel="noopener">🔗 Волонтёры культуры | Тульская область</a>'
+    },
+    quiz: {
+        type: 'quiz',
+        title: '📝 Викторина',
+        question: 'Как называется вид волонтёрства, когда люди помогают в больницах и хосписах?',
+        answers: [
+            { text: 'Спортивное волонтёрство', correct: false,
+                explanation: '❌ Нет. Спортивные волонтёры помогают на соревнованиях: Олимпиадах, чемпионатах, марафонах.' },
+            { text: 'Медицинское волонтёрство', correct: true,
+                explanation: '✅ Верно! Медицинские волонтёры помогают в уходе за пациентами, проводят акции по донорству крови, участвуют в профилактических мероприятиях. В России это направление курирует движение «Волонтёры-медики».' },
+            { text: 'Экологическое волонтёрство', correct: false,
+                explanation: '❌ Нет. Экологические волонтёры заботятся о природе: сажают деревья, убирают мусор, защищают животных.' },
+            { text: 'Событийное волонтёрство', correct: false,
+                explanation: '❌ Нет. Событийные волонтёры помогают на фестивалях, форумах, концертах и городских праздниках.' }
+        ]
+    },
+    case: {
+        type: 'case',
+        title: '💼 Ситуация',
+        question: 'Культурный центр просит помочь с организацией выставки местных художников. Что выберете?',
+        answers: [
+            { text: 'Просто придёте и поможете расставить стулья', resources: 1, correct: false,
+                explanation: '🙂 Это тоже помощь, спасибо! Но вы способны на большее. Организаторы будут рады вашим идеям. 1 ресурс.' },
+            { text: 'Предложите провести экскурсии для посетителей', resources: 2, correct: false,
+                explanation: '👍 Хорошо! Вы не просто физически помогаете, но и делитесь знаниями. Посетители узнают больше о художниках. 2 ресурса.' },
+            { text: 'Разработаете программу мероприятия и привлечёте местных блогеров', resources: 3,
+                correct: true,
+                explanation: '🌟 Превосходно! Комплексный подход даёт максимальный эффект: больше гостей, больше пользы для художников, больше огласки. Настоящее культурное волонтёрство! 3 ресурса.' }
+        ]
+    }
+}, {
+    title: 'Раунд 3: Основы государственности — как устроена власть',
+    intro: 'Волонтёры часто работают вместе с государством. Чтобы делать добрые дела эффективно, важно понимать, как устроена власть в России, куда обращаться за поддержкой и какие у нас есть права.\n\nСегодня мы изучим основы государственности и поможем зданию Администрации наладить диалог с жителями.',
+    nko: {
+        title: 'Реальная история: Фонд президентских грантов',
+        text: '<div class="nko-name">🏛️ Фонд президентских грантов</div>' +
+            '<div class="nko-desc">Фонд президентских грантов — это государственная организация, которая выделяет деньги на социальные проекты НКО по всей России. Любая некоммерческая организация может подать заявку и получить финансирование на свой проект.<br><br>' +
+            '<strong>Цифры:</strong> Ежегодно Фонд распределяет миллиарды рублей на тысячи проектов: от помощи бездомным до развития спорта в сёлах.<br><br>' +
+            '💡 <em>«Государство поддерживает тех, кто готов менять мир к лучшему. Грант — это не подарок, а доверие.»</em></div>' +
+            '<a class="nko-link" href="https://президентскиегранты.рф" target="_blank" rel="noopener">🔗 Открыть сайт Фонда президентских грантов</a>'
+    },
+    quiz: {
+        type: 'quiz',
+        title: '📝 Викторина',
+        question: 'Как называется высший законодательный орган в Российской Федерации?',
+        answers: [
+            { text: 'Правительство РФ', correct: false,
+                explanation: '❌ Нет. Правительство — это исполнительная власть. Оно исполняет законы, а не принимает их. Возглавляет Правительство премьер-министр.' },
+            { text: 'Федеральное Собрание', correct: true,
+                explanation: '✅ Верно! Федеральное Собрание — парламент России. Состоит из двух палат: Государственной Думы (принимает законы) и Совета Федерации (одобряет законы). Это и есть законодательная власть.' },
+            { text: 'Конституционный суд', correct: false,
+                explanation: '❌ Нет. Конституционный суд проверяет законы на соответствие Конституции, но не принимает их. Это судебная власть.' },
+            { text: 'Администрация Президента', correct: false,
+                explanation: '❌ Нет. Администрация Президента помогает главе государства в его работе, но законы принимает Федеральное Собрание.' }
+        ]
+    },
+    case: {
+        type: 'case',
+        title: '💼 Ситуация',
+        question: 'Вы решили благоустроить пустырь. По закону нужно согласовать проект с местной администрацией. Как лучше действовать?',
+        answers: [
+            { text: 'Написать письмо в свободной форме и отправить по почте', resources: 1, correct: false,
+                explanation: '📬 Это работает, но медленно. Письмо может идти неделями, а ответа ждать до 30 дней. Есть более быстрые способы. 1 ресурс.' },
+            { text: 'Подать заявку через портал Госуслуг — «Инициативное бюджетирование»', resources: 3,
+                correct: true,
+                explanation: '🌟 Отлично! Инициативное бюджетирование — это программа, где жители сами решают, на что потратить часть городского бюджета. Подаёте проект, жители голосуют, администрация выделяет деньги. Быстро и прозрачно! 3 ресурса.' },
+            { text: 'Собрать подписи жителей и принести в администрацию', resources: 2, correct: false,
+                explanation: '👍 Хороший путь! Подписи показывают, что проект поддерживают люди. Но электронный способ быстрее и удобнее для всех. 2 ресурса.' }
+        ]
+    }
+}, {
+    title: 'Раунд 4: НКО России — кто помогает людям',
+    intro: 'В России тысячи некоммерческих организаций. Они помогают пожилым, детям, животным, защищают природу, развивают спорт и культуру.\n\nВ Тульской области работают десятки НКО. Сегодня мы познакомимся с ними поближе и поможем Социальному центру, который нуждается в волонтёрах.',
+    nko: {
+        title: 'Реальная история: НКО Тульской области',
+        text: '<div class="nko-name">🤝 НКО Тульской области</div>' +
+            '<div class="nko-desc"><strong>В Тульской области активно работают:</strong><br><br>' +
+            '• <strong>«Забота»</strong> — помощь одиноким пожилым людям: доставка продуктов, уборка, общение.<br>' +
+            '• <strong>«Экспресс-волонтёр»</strong> — оперативная помощь в экстренных ситуациях.<br>' +
+            '• <strong>Поисковый отряд «ЛизаАлерт»</strong> — поиск пропавших людей (отделение в Туле).<br>' +
+            '• <strong>«Добрый мир»</strong> — поддержка детей с особенностями развития.<br><br>' +
+            'Все эти организации можно найти на платформе Добро.ру и присоединиться к их акциям.<br><br>' +
+            '💡 <em>«Не обязательно быть героем. Достаточно быть неравнодушным.»</em></div>' +
+            '<a class="nko-link" href="https://добро.рф/organizations" target="_blank" rel="noopener">🔗 Найти НКО вашего города на Добро.ру</a>'
+    },
+    quiz: {
+        type: 'quiz',
+        title: '📝 Викторина',
+        question: 'Какой федеральный портал объединяет волонтёров и НКО по всей России?',
+        answers: [
+            { text: 'Добро.ру', correct: true,
+                explanation: '✅ Верно! Добро.ру — единая федеральная платформа. Здесь можно найти волонтёрскую акцию, пройти обучение, получить волонтёрскую книжку и даже заработать баллы для поступления в вуз.' },
+            { text: 'Волонтёр.рф', correct: false,
+                explanation: '❌ Нет. Такого федерального портала не существует. Официальная платформа — Добро.ру.' },
+            { text: 'Помощь.онлайн', correct: false,
+                explanation: '❌ Нет. Есть разные локальные сайты помощи, но единая федеральная платформа — Добро.ру.' },
+            { text: 'Благо.ру', correct: false,
+                explanation: '❌ Нет. Благо.ру — это благотворительный интернет-фонд, но он не является федеральной платформой для волонтёров.' }
+        ]
+    },
+    case: {
+        type: 'case',
+        title: '💼 Ситуация',
+        question: 'Вы узнали, что в вашем городе организация «Забота» помогает одиноким пожилым людям. Вы хотите помочь. Что сделаете?',
+        answers: [
+            { text: 'Самостоятельно купите продукты и отнесёте бабушке', resources: 1, correct: false,
+                explanation: '❤️ Добрая инициатива! Но в одиночку сложно узнать, кому именно нужна помощь. Организация «Забота» уже знает всех подопечных. 1 ресурс.' },
+            { text: 'Найдёте «Заботу» на Добро.ру и присоединитесь к их акции', resources: 3, correct: true,
+                explanation: '🌟 Лучший выбор! Присоединяясь к организации, вы становитесь частью системы помощи. Ваши усилия будут направлены туда, где они нужнее всего. 3 ресурса!' },
+            { text: 'Попросите друзей скинуться деньгами', resources: 2, correct: false,
+                explanation: '👍 Совместные действия лучше одиночных. Но деньги — не всегда то, что нужно. Часто пожилым важнее простое человеческое общение. 2 ресурса.' }
+        ]
+    }
+}, {
+    title: 'Раунд 5: Патриотизм — это добрые дела',
+    intro: 'Патриотизм — это не громкие лозунги, а реальные дела на благо своей страны, своего города, своих соседей.\n\nКаждый раз, когда вы помогаете другим, вы делаете Россию лучше. Сегодня мы вспомним героев, которые меняли страну, и завершим восстановление Города!',
+    nko: {
+        title: 'История героя: настоящий патриотизм',
+        text: '<div class="nko-name">⭐ Герои среди нас</div>' +
+            '<div class="nko-desc">Патриотизм проявляется по-разному:<br><br>' +
+            '• <strong>Врачи</strong> в пандемию работали сутками, спасая жизни.<br>' +
+            '• <strong>Учителя</strong> в сельских школах годами учат детей, сохраняя образование на местах.<br>' +
+            '• <strong>Волонтёры</strong> во время наводнений и пожаров первыми приходят на помощь.<br>' +
+            '• <strong>Поисковики</strong> из «ЛизаАлерт» находят пропавших людей в любую погоду.<br><br>' +
+            'Звание Героя России присваивается за выдающиеся заслуги. Но героем может быть каждый, кто делает добрые дела там, где живёт.<br><br>' +
+            '💡 <em>«Патриотизм — это когда ты делаешь свой город, свою улицу, свой подъезд лучше, чем они были вчера.»</em></div>' +
+            '<a class="nko-link" href="https://добро.рф" target="_blank" rel="noopener">🔗 Присоединиться к волонтёрам на Добро.ру</a>'
+    },
+    quiz: {
+        type: 'quiz',
+        title: '📝 Викторина',
+        question: 'Как называется высшее почётное звание за особые заслуги перед государством и обществом?',
+        answers: [
+            { text: 'Ветеран труда', correct: false,
+                explanation: '❌ Нет. Это почётное звание за многолетний труд, но не высшая награда страны.' },
+            { text: 'Герой Российской Федерации', correct: true,
+                explanation: '✅ Верно! Звание Героя России — высшая награда. Присваивается Президентом за подвиги и выдающиеся заслуги. Герою вручают медаль «Золотая Звезда».' },
+            { text: 'Заслуженный деятель', correct: false,
+                explanation: '❌ Нет. Это почётное звание в разных сферах (науки, искусства), но не высшая награда.' },
+            { text: 'Почётный гражданин', correct: false,
+                explanation: '❌ Нет. Это звание присваивается на уровне города или региона, а не всей страны.' }
+        ]
+    },
+    case: {
+        type: 'case',
+        title: '💼 Ситуация',
+        question: 'В вашем районе живёт пожилой ветеран. Ему нужна помощь по хозяйству. Что вы сделаете?',
+        answers: [
+            { text: 'Подождёте, пока кто-то другой поможет', resources: 1, correct: false,
+                explanation: '😔 Если все будут ждать — никто не поможет. Настоящий патриотизм — это действие, а не ожидание. 1 ресурс.' },
+            { text: 'Напишете пост в соцсетях с призывом помочь', resources: 2, correct: false,
+                explanation: '👍 Хорошо! Вы привлекаете внимание к проблеме. Но можно не только написать, но и сделать. 2 ресурса.' },
+            { text: 'Соберётесь с друзьями и лично предложите конкретную помощь', resources: 3,
+                correct: true,
+                explanation: '🌟 Превосходно! Именно так проявляется настоящий патриотизм — в конкретных добрых делах. Ветераны защищали нашу страну, теперь наша очередь помочь им. 3 ресурса!' }
+        ]
+    }
+}];
+
+        // ==================== ЭКРАНЫ ====================
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        // ==================== СТАРТ ====================
+        function startGame() {
+            gameState.currentRound = 0;
+            gameState.resources = 3;
+            gameState.blago = 0;
+            for (let key in gameState.districts) {
+                gameState.districts[key].level = 0;
+            }
+            showRoundIntro();
+        }
+
+        function showRoundIntro() {
+            const round = rounds[gameState.currentRound];
+            document.getElementById('round-label').textContent =
+                `Раунд ${gameState.currentRound + 1} из ${rounds.length}`;
+            document.getElementById('intro-title').textContent = round.title;
+            document.getElementById('intro-text').textContent = round.intro;
+            showScreen('screen-intro');
+        }
+
+        function startRoundQuestions() {
+            showNkoCard();
+        }
+
+        // ==================== КАРТОЧКА НКО ====================
+        function showNkoCard() {
+            const round = rounds[gameState.currentRound];
+            document.getElementById('nko-title').textContent = round.nko.title;
+            document.getElementById('nko-card').innerHTML = round.nko.text;
+            showScreen('screen-nko');
+        }
+
+        function nextAfterNko() {
+            const round = rounds[gameState.currentRound];
+            gameState.roundQuestions = [round.quiz, round.case];
+            gameState.currentQuestionIndex = 0;
+            showQuestion();
+        }
+
+        // ==================== ВОПРОСЫ ====================
+        function showQuestion() {
+            if (gameState.currentQuestionIndex >= gameState.roundQuestions.length) {
+                showDevelopScreen();
+                return;
+            }
+
+            const question = gameState.roundQuestions[gameState.currentQuestionIndex];
+            document.getElementById('question-title').textContent = question.title;
+            document.getElementById('question-text').textContent = question.question;
+
+            const answersContainer = document.getElementById('answers-container');
+            answersContainer.innerHTML = '';
+
+            question.answers.forEach((answer, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'btn-answer';
+                btn.textContent = `${['А', 'Б', 'В', 'Г'][index]}) ${answer.text}`;
+                btn.onclick = function() {
+                    handleAnswer(question, index, btn);
+                };
+                answersContainer.appendChild(btn);
+            });
+
+            document.getElementById('explanation-container').style.display = 'none';
+            document.getElementById('btn-next-question').style.display = 'none';
+            showScreen('screen-question');
+        }
+
+        function handleAnswer(question, chosenIndex, clickedBtn) {
+            const allBtns = document.querySelectorAll('.btn-answer');
+            allBtns.forEach((btn, index) => {
+                btn.disabled = true;
+                if (question.answers[index].correct) {
+                    btn.classList.add('correct');
+                }
+            });
+
+            const chosenAnswer = question.answers[chosenIndex];
+            let earned = 0;
+
+            if (question.type === 'quiz') {
+                earned = chosenAnswer.correct ? 2 : 1;
+                if (!chosenAnswer.correct) clickedBtn.classList.add('wrong');
+            } else {
+                earned = chosenAnswer.resources;
+            }
+
+            gameState.resources += earned;
+            gameState.blago += earned;
+
+            const box = document.getElementById('explanation-container');
+            box.innerHTML =
+                `<strong>💰 +${earned} ресурс(ов) получено!</strong><br><br>${chosenAnswer.explanation}`;
+            box.style.display = 'block';
+
+            const nextBtn = document.getElementById('btn-next-question');
+            nextBtn.style.display = 'block';
+            nextBtn.textContent = gameState.currentQuestionIndex < gameState.roundQuestions.length - 1 ?
+                '▶️ Следующий вопрос' : '▶️ К развитию города';
+        }
+
+        function nextQuestion() {
+            gameState.currentQuestionIndex++;
+            if (gameState.currentQuestionIndex >= gameState.roundQuestions.length) {
+                showDevelopScreen();
+            } else {
+                showQuestion();
+            }
+        }
+
+        // ==================== РАЗВИТИЕ ГОРОДА ====================
+        function showDevelopScreen() {
+            document.getElementById('dev-resources').textContent = gameState.resources;
+            document.getElementById('dev-blago').textContent = gameState.blago;
+
+            const container = document.getElementById('dev-districts');
+            container.innerHTML = '';
+
+            const allMaxed = Object.values(gameState.districts).every(d => d.level >= d.max);
+
+            for (let key in gameState.districts) {
+                const d = gameState.districts[key];
+                const div = document.createElement('div');
+                div.className = `district level-${d.level}`;
+                div.innerHTML = `
+                    <div class="district-icon">${d.icon}</div>
+                    <div class="district-name">${d.name}</div>
+                    <div class="district-progress">${d.level}/${d.max}</div>
+                `;
+
+                if (d.level < d.max && gameState.resources >= 2) {
+                    div.classList.add('clickable');
+                    div.onclick = function() { upgradeDistrict(key); };
+                } else if (d.level >= d.max) {
+                    div.style.opacity = '0.7';
+                    div.title = '✅ Район полностью восстановлен!';
+                } else {
+                    div.style.opacity = '0.5';
+                    div.title = '🔒 Не хватает ресурсов (нужно 2)';
+                }
+
+                container.appendChild(div);
+            }
+
+            // Кнопка продолжения
+            const continueContainer = document.getElementById('dev-continue-container');
+            continueContainer.innerHTML = '';
+            const btn = document.createElement('button');
+            btn.textContent = allMaxed ? '🏆 Завершить игру' : '▶️ На карту города';
+            btn.style.marginTop = '20px';
+            btn.onclick = function() {
+                if (allMaxed) {
+                    endGame();
+                } else {
+                    showMapScreen();
+                }
+            };
+            continueContainer.appendChild(btn);
+
+            showScreen('screen-develop');
+        }
+
+        function upgradeDistrict(key) {
+            if (gameState.resources < 2) return;
+            if (gameState.districts[key].level >= gameState.districts[key].max) return;
+
+            gameState.resources -= 2;
+            gameState.districts[key].level++;
+            gameState.blago += 2;
+
+            showDevelopScreen();
+        }
+
+        // ==================== КАРТА ====================
+        function showMapScreen() {
+            document.getElementById('map-resources').textContent = gameState.resources;
+            document.getElementById('map-blago').textContent = gameState.blago;
+
+            const percent = Math.min(100, Math.round((gameState.blago / 50) * 100));
+            document.getElementById('map-progress-bar').style.width = percent + '%';
+            document.getElementById('map-progress-bar').textContent = percent + '%';
+
+            const container = document.getElementById('map-districts');
+            container.innerHTML = '';
+
+            for (let key in gameState.districts) {
+                const d = gameState.districts[key];
+                const div = document.createElement('div');
+                div.className = `district level-${d.level}`;
+                div.innerHTML = `
+                    <div class="district-icon">${d.icon}</div>
+                    <div class="district-name">${d.name}</div>
+                    <div class="district-progress">${d.level}/${d.max}</div>
+                `;
+                container.appendChild(div);
+            }
+
+            showScreen('screen-map');
+        }
+
+        function goToNextRound() {
+            gameState.currentRound++;
+            if (gameState.currentRound >= rounds.length) {
+                endGame();
+                return;
+            }
+            showRoundIntro();
+        }
+
+        // ==================== ФИНАЛ ====================
+        function endGame() {
+            const allMaxed = Object.values(gameState.districts).every(d => d.level >= d.max);
+            const blagoEnough = gameState.blago >= 50;
+
+            let title, stars, text;
+
+            if (allMaxed && blagoEnough) {
+                title = '🥇 Золотой финал!';
+                stars = '⭐⭐⭐';
+                text =
+                    'Вы полностью возродили Город Добрых Дел! Все районы восстановлены, Центр Гражданского Общества построен.\n\nВы узнали, как работают НКО, как устроено государство и что такое настоящий патриотизм.\n\nПомните: добрые дела начинаются с вас. Заходите на Добро.ру и становитесь волонтёрами в реальной жизни!';
+            } else if (blagoEnough || allMaxed) {
+                title = '🥈 Серебряный финал!';
+                stars = '⭐⭐';
+                text =
+                    'Вы отлично поработали! Город стал заметно лучше.\n\nВы познакомились с работой НКО, узнали об основах государственности и попробовали себя в роли волонтёров.\n\nПриходите ещё — настоящие добрые дела требуют времени!';
+            } else {
+                title = '🥉 Бронзовый финал!';
+                stars = '⭐';
+                text =
+                    'Вы начали важный путь! Город ждёт вашей помощи.\n\nКаждое доброе дело меняет мир к лучшему. Вы узнали много нового об НКО, волонтёрстве и гражданском обществе.\n\nНе останавливайтесь — заходите на Добро.ру и присоединяйтесь к реальным проектам!';
+            }
+
+            document.getElementById('final-title').textContent = title;
+            document.getElementById('final-stars').textContent = stars;
+            document.getElementById('final-text').textContent = text;
+
+            let statsHTML = '';
+            for (let key in gameState.districts) {
+                const d = gameState.districts[key];
+                statsHTML +=
+                    `<div class="final-stat">${d.icon} ${d.name}: <strong>${d.level}/${d.max}</strong></div>`;
+            }
+            statsHTML +=
+                `<div class="final-stat">🏆 Общественное благо: <strong>${gameState.blago}</strong></div>`;
+            statsHTML +=
+                `<div class="final-stat">💰 Остаток ресурсов: <strong>${gameState.resources}</strong></div>`;
+            document.getElementById('final-stats').innerHTML = statsHTML;
+
+            showScreen('screen-final');
+        }
+    </script>
+</body>
+</html>
