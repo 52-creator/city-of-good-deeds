@@ -130,7 +130,7 @@
         <p>Интерактивная игра о волонтёрстве,<br>некоммерческих организациях и гражданском обществе</p>
         <p>Вы — команда. Вместе вы пройдёте три раунда, заработаете баллы<br>и поможете городским учреждениям.</p>
         <p style="font-size:0.9em;opacity:0.8;">🎯 Цель: узнать о волонтёрстве и найти организацию,<br>которая подходит именно вашему классу</p>
-        <p style="font-size:0.85em;opacity:0.7;">⏱️ Время игры: 60–90 минут<br>🗳️ Голосуйте всем классом! Учитель нажимает вариант, выбранный большинством</p>
+        <p style="font-size:0.85em;opacity:0.7;">🗳️ Голосуйте всем классом! Учитель нажимает вариант, выбранный большинством</p>
         <button onclick="startGame()">🚀 Начать игру</button>
     </div>
 
@@ -214,7 +214,7 @@
 <script>
     // ==================== СОСТОЯНИЕ ====================
     const gameState = {
-        totalScore: 0, quizCorrect: 0, quizTotal: 8, caseScore: 0,
+        totalScore: 0, quizCorrect: 0, quizTotal: 10, caseScore: 0,
         dilemmaValues: [],
         spent: { hospital: 0, elderly: 0, park: 0, library: 0, shelter: 0 },
         currentRound: '', currentQuestions: [], currentQuestionIndex: 0, infoNextAction: null
@@ -258,7 +258,7 @@
         else if (a === 'startDilemmas') startDilemmas();
     }
 
-    // ==================== ВИКТОРИНА ====================
+    // ==================== ВИКТОРИНА (10 вопросов) ====================
     const quizQuestions = [
         { question: 'В каком году принят закон «О благотворительной деятельности и добровольчестве»?', answers: [{ text: '1995 год', correct: true }, { text: '2005 год', correct: false }, { text: '2010 год', correct: false }, { text: '2018 год', correct: false }], explanation: 'Закон №135-ФЗ принят в 1995 году. В 2018 году внесли важные поправки о поддержке волонтёров.' },
         { question: 'Какой портал объединяет волонтёров и НКО по всей России?', answers: [{ text: 'Волонтёр.рф', correct: false }, { text: 'Добро.ру', correct: true }, { text: 'Помощь.онлайн', correct: false }, { text: 'Благо.ру', correct: false }], explanation: 'Добро.ру — единая федеральная платформа. Здесь можно найти акцию, пройти обучение и получить волонтёрскую книжку.' },
@@ -267,50 +267,44 @@
         { question: 'Как называется высшее почётное звание за особые заслуги перед государством?', answers: [{ text: 'Герой Российской Федерации', correct: true }, { text: 'Ветеран труда', correct: false }, { text: 'Заслуженный деятель', correct: false }, { text: 'Почётный гражданин', correct: false }], explanation: 'Звание Героя России — высшая награда страны. Присваивается Президентом, вручается медаль «Золотая Звезда».' },
         { question: 'Какой закон регулирует деятельность некоммерческих организаций?', answers: [{ text: 'Трудовой кодекс', correct: false }, { text: 'Гражданский кодекс', correct: false }, { text: 'Закон «О некоммерческих организациях»', correct: true }, { text: 'Административный кодекс', correct: false }], explanation: 'ФЗ №7 «О некоммерческих организациях» определяет, как создаются и работают НКО.' },
         { question: 'Какая организация выделяет гранты на социальные проекты НКО?', answers: [{ text: 'Фонд национального благосостояния', correct: false }, { text: 'Фонд президентских грантов', correct: true }, { text: 'Фонд социального страхования', correct: false }, { text: 'Пенсионный фонд', correct: false }], explanation: 'Фонд президентских грантов ежегодно распределяет миллиарды рублей на проекты НКО по всей России.' },
-        { question: 'Какие волонтёрские часы учитываются при поступлении в вуз?', answers: [{ text: 'Только медицинские', correct: false }, { text: 'Только спортивные', correct: false }, { text: 'Любые, по словам абитуриента', correct: false }, { text: 'Зафиксированные через Добро.ру', correct: true }], explanation: 'Часы, зафиксированные через Добро.ру, могут давать дополнительные баллы при поступлении в некоторые вузы.' }
+        { question: 'Какие волонтёрские часы учитываются при поступлении в вуз?', answers: [{ text: 'Только медицинские', correct: false }, { text: 'Только спортивные', correct: false }, { text: 'Любые, по словам абитуриента', correct: false }, { text: 'Зафиксированные через Добро.ру', correct: true }], explanation: 'Часы, зафиксированные через Добро.ру, могут давать дополнительные баллы при поступлении в некоторые вузы.' },
+        { question: 'Что из перечисленного является видом волонтёрства?', answers: [{ text: 'Медицинское', correct: false }, { text: 'Экологическое', correct: false }, { text: 'Событийное', correct: false }, { text: 'Всё перечисленное', correct: true }], explanation: 'Существует множество видов волонтёрства: медицинское, экологическое, событийное, культурное, спортивное и другие.' },
+        { question: 'Как расшифровывается аббревиатура НКО?', answers: [{ text: 'Некоммерческая организация', correct: true }, { text: 'Национальное кадровое общество', correct: false }, { text: 'Независимый координационный отдел', correct: false }, { text: 'Народный контроль общества', correct: false }], explanation: 'НКО — некоммерческая организация. Это организация, которая работает не ради прибыли, а ради социально значимых целей.' }
     ];
 
-    // ==================== КЕЙСЫ (правильные ответы перемешаны) ====================
+    // ==================== КЕЙСЫ (8 ситуаций) ====================
     const caseQuestions = [
         { title: 'Ситуация 1: Субботник в парке', question: 'Вы хотите провести субботник, но нет инвентаря. Как поступите?',
-            answers: [
-                { text: 'Обратиться в администрацию района', score: 2 },
-                { text: 'Найти местного бизнес-партнёра', score: 3 },
-                { text: 'Купить всё за свой счёт', score: 1 }
-            ],
+            answers: [{ text: 'Обратиться в администрацию района', score: 2 }, { text: 'Найти местного бизнес-партнёра', score: 3 }, { text: 'Купить всё за свой счёт', score: 1 }],
             nko: { name: 'ТРОО «Экологическая защита»', desc: 'Проводит субботники и экоакции в Тульской области. Можно присоединиться к ближайшей уборке парка или предложить свою территорию.', link: 'https://dobro.ru/organizations/10007669/feed' }
         },
         { title: 'Ситуация 2: Помощь ветерану', question: 'В вашем районе живёт одинокий ветеран. Ему нужна помощь. Что сделаете?',
-            answers: [
-                { text: 'Собраться с друзьями и лично предложить помощь', score: 3 },
-                { text: 'Подождать, пока кто-то другой поможет', score: 1 },
-                { text: 'Написать пост в соцсетях с призывом', score: 2 }
-            ],
+            answers: [{ text: 'Собраться с друзьями и лично предложить помощь', score: 3 }, { text: 'Подождать, пока кто-то другой поможет', score: 1 }, { text: 'Написать пост в соцсетях с призывом', score: 2 }],
             nko: { name: 'Тульское отделение БФ «Старость в радость»', desc: 'Фонд помогает пожилым людям: волонтёры навещают бабушек и дедушек, организуют праздники, дарят внимание.', link: 'https://dobro.ru/organizations/187099/about' }
         },
         { title: 'Ситуация 3: Благоустройство пустыря', question: 'Хотите благоустроить пустырь. Как согласовать с властями?',
-            answers: [
-                { text: 'Написать письмо в свободной форме', score: 1 },
-                { text: 'Подать заявку через Госуслуги', score: 3 },
-                { text: 'Собрать подписи жителей', score: 2 }
-            ],
+            answers: [{ text: 'Написать письмо в свободной форме', score: 1 }, { text: 'Подать заявку через Госуслуги', score: 3 }, { text: 'Собрать подписи жителей', score: 2 }],
             nko: { name: 'Фонд президентских грантов', desc: 'Государственный фонд финансирует проекты НКО, в том числе по благоустройству территорий.', link: 'https://президентскиегранты.рф' }
         },
         { title: 'Ситуация 4: Выставка в библиотеке', question: 'Культурный центр просит помочь с выставкой. Что выберете?',
-            answers: [
-                { text: 'Разработать программу и привлечь блогеров', score: 3 },
-                { text: 'Провести экскурсии для посетителей', score: 2 },
-                { text: 'Помочь расставить стулья и картины', score: 1 }
-            ],
+            answers: [{ text: 'Разработать программу и привлечь блогеров', score: 3 }, { text: 'Провести экскурсии для посетителей', score: 2 }, { text: 'Помочь расставить стулья и картины', score: 1 }],
             nko: { name: 'Волонтёры культуры Тульской области', desc: 'Помогают в музеях, библиотеках, на фестивалях. Можно проводить экскурсии и помогать с реставрацией.', link: 'https://dobro.ru/organizations/10065923/about' }
         },
         { title: 'Ситуация 5: Помощь приюту', question: 'Приют для животных просит о помощи. У вас нет денег, но есть время. Что сделаете?',
-            answers: [
-                { text: 'Пройти мимо', score: 1 },
-                { text: 'Прийти и помочь с выгулом собак', score: 3 },
-                { text: 'Рассказать друзьям и в соцсетях', score: 2 }
-            ],
+            answers: [{ text: 'Пройти мимо', score: 1 }, { text: 'Прийти и помочь с выгулом собак', score: 3 }, { text: 'Рассказать друзьям и в соцсетях', score: 2 }],
             nko: { name: 'Приют «Любимец» (Тула)', desc: 'Приют для бездомных животных. Всегда нужны волонтёры для прогулок с собаками, уборки и фотосъёмки.', link: 'https://dobro.ru/organizations/10009359/about' }
+        },
+        { title: 'Ситуация 6: Сбор гуманитарной помощи', question: 'Вы хотите организовать сбор вещей для пострадавших от пожара. С чего начнёте?',
+            answers: [{ text: 'Разместить объявление в подъезде', score: 1 }, { text: 'Согласовать с администрацией и открыть пункт сбора', score: 3 }, { text: 'Кинуть клич в соцсетях', score: 2 }],
+            nko: { name: 'Центр социальной поддержки «Ангелочек»', desc: 'Жизнь непредсказуема и порой подкидывает неожиданные испытания. Волонтеры центра готовы протянуть руку помощи тем, кто оказался в трудной ситуации.', link: 'https://vk.com/csp_angel', linkText: 'Узнать подробнее в сообществе ВК'}
+        },
+        { title: 'Ситуация 7: Посадка деревьев', question: 'Вы решили посадить деревья во дворе. Где взять саженцы?',
+            answers: [{ text: 'Купить в питомнике за свой счёт', score: 1 }, { text: 'Обратиться в лесничество — часто выдают бесплатно', score: 3 }, { text: 'Попросить у соседей лишние саженцы с дачи', score: 2 }],
+            nko: { name: 'ТРОО «Экологическая защита»', desc: 'Организация проводит акции по озеленению и знает, где взять саженцы законно и бесплатно.', link: 'https://dobro.ru/organizations/10007669/feed' }
+        },
+        { title: 'Ситуация 8: Донорство крови', question: 'Вы хотите стать донором крови. Что нужно сделать в первую очередь?',
+            answers: [{ text: 'Прийти в больницу и попросить взять кровь', score: 1 }, { text: 'Узнать на сайте станции переливания требования и записаться', score: 3 }, { text: 'Спросить у знакомого врача', score: 2 }],
+            nko: { name: 'Тульское отделение «Волонтёры-медики»', desc: 'Проводят донорские акции и рассказывают, как правильно подготовиться к сдаче крови.', link: 'https://dobro.ru/organizations/834/about' }
         }
     ];
 
@@ -339,36 +333,36 @@
         }
     ];
 
-    // ==================== УЧРЕЖДЕНИЯ ====================
+    // ==================== УЧРЕЖДЕНИЯ (стоимость 3/5/7) ====================
     const institutions = [
         { id: 'hospital', name: '🏥 Городская больница', desc: 'Медицинское волонтёрство', tasks: [
-            { text: 'Расклеить плакаты о донорстве', cost: 2, done: false },
-            { text: 'Провести лекцию о ЗОЖ для пациентов', cost: 4, done: false },
-            { text: 'Организовать день донора с выездной бригадой', cost: 6, done: false }
+            { text: 'Расклеить плакаты о донорстве', cost: 3, done: false },
+            { text: 'Провести лекцию о ЗОЖ для пациентов', cost: 5, done: false },
+            { text: 'Организовать день донора с выездной бригадой', cost: 7, done: false }
         ]},
         { id: 'elderly', name: '👴 Дом престарелых', desc: 'Социальное волонтёрство', tasks: [
-            { text: 'Купить и привезти продукты', cost: 2, done: false },
-            { text: 'Организовать концерт силами волонтёров', cost: 4, done: false },
-            { text: 'Запустить программу регулярных визитов', cost: 6, done: false }
+            { text: 'Купить и привезти продукты', cost: 3, done: false },
+            { text: 'Организовать концерт силами волонтёров', cost: 5, done: false },
+            { text: 'Запустить программу регулярных визитов', cost: 7, done: false }
         ]},
         { id: 'park', name: '🌳 Городской парк', desc: 'Экологическое волонтёрство', tasks: [
-            { text: 'Убрать мусор вдоль дорожек', cost: 2, done: false },
-            { text: 'Посадить 10 деревьев', cost: 4, done: false },
-            { text: 'Разработать проект раздельного сбора мусора', cost: 6, done: false }
+            { text: 'Убрать мусор вдоль дорожек', cost: 3, done: false },
+            { text: 'Посадить 10 деревьев', cost: 5, done: false },
+            { text: 'Разработать проект раздельного сбора мусора', cost: 7, done: false }
         ]},
         { id: 'library', name: '📚 Детская библиотека', desc: 'Культурное волонтёрство', tasks: [
-            { text: 'Помочь расставить книги на полках', cost: 2, done: false },
-            { text: 'Провести громкие чтения для детей', cost: 4, done: false },
-            { text: 'Организовать книжный фестиваль', cost: 6, done: false }
+            { text: 'Помочь расставить книги на полках', cost: 3, done: false },
+            { text: 'Провести громкие чтения для детей', cost: 5, done: false },
+            { text: 'Организовать книжный фестиваль', cost: 7, done: false }
         ]},
         { id: 'shelter', name: '🐾 Приют для животных', desc: 'Зооволонтёрство', tasks: [
-            { text: 'Привезти корм и наполнитель', cost: 2, done: false },
-            { text: 'Помочь с выгулом собак в выходные', cost: 4, done: false },
-            { text: 'Организовать фотовыставку для поиска хозяев', cost: 6, done: false }
+            { text: 'Привезти корм и наполнитель', cost: 3, done: false },
+            { text: 'Помочь с выгулом собак в выходные', cost: 5, done: false },
+            { text: 'Организовать фотовыставку для поиска хозяев', cost: 7, done: false }
         ]}
     ];
 
-    // ==================== ОРГАНИЗАЦИИ ДЛЯ ФИНАЛА ====================
+    // ==================== ОРГАНИЗАЦИИ ====================
     const orgs = {
         hospital: { name: 'Тульское отделение «Волонтёры-медики»', desc: 'Всероссийское движение. Помогают в больницах, проводят акции по донорству, рассказывают о ЗОЖ.', link: 'https://dobro.ru/organizations/834/about', icon: '🏥' },
         elderly: { name: 'Тульское отделение БФ «Старость в радость»', desc: 'Фонд помогает пожилым людям. Волонтёры навещают, общаются, организуют праздники.', link: 'https://dobro.ru/organizations/187099/about', icon: '👴' },
@@ -421,11 +415,11 @@
     }
     function showQuizVerdict() {
         const s = gameState.quizCorrect; let joke;
-        if(s === 8) joke = '🥇 Путин одобрил бы';
-        else if(s >= 6) joke = '🥈 Иноагентом не признан';
-        else if(s >= 4) joke = '🥉 До Шамана недотянул';
+        if(s >= 9) joke = '🥇 Путин одобрил бы';
+        else if(s >= 7) joke = '🥈 До Шамана недотянул';
+        else if(s >= 5) joke = '🥉 Иноагентом не признан';
         else joke = '📖 Паспорт РФ не заслужил';
-        document.getElementById('verdict-score').textContent = `${s} из 8 правильных`;
+        document.getElementById('verdict-score').textContent = `${s} из 10 правильных`;
         document.getElementById('verdict-joke').textContent = joke;
         showScreen('screen-verdict');
     }
@@ -449,10 +443,10 @@
         document.getElementById('btn-next').style.display = 'none';
         showScreen('screen-round');
     }
-        function handleCaseAnswer(index, clickedBtn) {
+    function handleCaseAnswer(index, clickedBtn) {
         const q = gameState.currentQuestions[gameState.currentQuestionIndex];
-        document.querySelectorAll('.btn-answer').forEach((btn,i) => { btn.disabled = true; if(q.answers[i].score === 3) btn.classList.add('correct'); });
-        if(q.answers[index].score < 3) clickedBtn.classList.add('wrong');
+        document.querySelectorAll('.btn-answer').forEach((btn,i) => { btn.disabled = true; });
+        clickedBtn.classList.add('correct');
         const earned = q.answers[index].score;
         gameState.caseScore += earned; gameState.totalScore += earned;
         const emoji = earned === 3 ? '🌟 Отлично!' : earned === 2 ? '👍 Хорошо!' : '🤔 Можно лучше!';
@@ -464,7 +458,7 @@
                 <div class="nko-case-divider"></div>
                 <div class="nko-case-name">🏢 ${q.nko.name}</div>
                 <div class="nko-case-desc">${q.nko.desc}</div>
-                <a class="nko-case-link" href="${q.nko.link}" target="_blank" rel="noopener">🔗 Узнать больше на Добро.ру</a>
+                <a class="nko-case-link" href="${q.nko.link}" target="_blank" rel="noopener">🔗 ${q.nko.linkText || 'Узнать больше на Добро.ру'}</a>
             </div>`;
         document.getElementById('btn-next').style.display = 'block';
         document.getElementById('btn-next').textContent = gameState.currentQuestionIndex < gameState.currentQuestions.length-1 ? '▶️ Следующая ситуация' : '▶️ Результаты кейсов';
@@ -546,7 +540,6 @@
         renderInstitutions();
         showScreen('screen-final');
     }
-
     function getTotalSpent() { return Object.values(gameState.spent).reduce((s,v) => s+v, 0); }
     function renderInstitutions() {
         const container = document.getElementById('institutions-container'); container.innerHTML = '';
@@ -556,7 +549,7 @@
             let tasksHTML = '';
             inst.tasks.forEach((t,i) => {
                 let cls = 'task-item'; if(t.done) cls += ' done'; if(!t.done && gameState.totalScore - getTotalSpent() < t.cost) cls += ' locked';
-                const costWord = t.cost === 6 ? '6 баллов' : t.cost + ' балла';
+                const costWord = t.cost === 7 ? '7 баллов' : t.cost + ' балла';
                 tasksHTML += `<div class="${cls}" onclick="toggleTask('${inst.id}',${i})"><span>${t.text}</span><span class="task-cost">${costWord}</span></div>`;
             });
             card.innerHTML = `<div class="institution-icon">${inst.name.split(' ')[0]}</div><div class="institution-name">${inst.name}</div><div style="opacity:0.7;margin-bottom:10px;">${inst.desc}</div>${tasksHTML}`;
@@ -591,7 +584,6 @@
             }
         }
 
-        // Если баллы не потрачены вообще — только ценности
         if(max === 0) {
             const v = gameState.dilemmaValues;
             if(v.filter(x => x==='personal').length >= 2) top = 'elderly';
@@ -601,22 +593,18 @@
             else top = 'park';
             reasonText = 'Вы не распределили баллы, поэтому мы опирались только на ваши ценности, проявленные в дилеммах. Эта сфера ближе всего вашему классу.';
         }
-        // Если один явный лидер
         else if(tied.length === 1) {
             top = tied[0];
             reasonText = 'Вы потратили сюда больше всего баллов — эта деятельность подходит вам больше остальных. Ваши приоритеты говорят сами за себя!';
         }
-        // Если ничья — ценности выбирают среди лидеров
         else {
             const v = gameState.dilemmaValues;
             let found = null;
-            
             if(tied.includes('elderly') && v.filter(x => x==='personal').length >= 2) found = 'elderly';
             else if(tied.includes('shelter') && v.includes('pragmatic') && v.includes('personal')) found = 'shelter';
             else if(tied.includes('hospital') && v.includes('system')) found = 'hospital';
             else if(tied.includes('library') && v.includes('awareness')) found = 'library';
             else if(tied.includes('park') && v.includes('independent')) found = 'park';
-            
             if(found) {
                 top = found;
                 reasonText = 'Вы потратили равное количество баллов в несколько сфер. Это значит, что вам сложно определить себя в одном направлении. Но на основе ваших ответов в 3 раунде и выявленных ценностей — эта деятельность подходит вам больше.';
